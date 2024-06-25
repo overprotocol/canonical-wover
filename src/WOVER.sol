@@ -7,9 +7,6 @@ interface IWOVER {
   function deposit() external payable;
   function withdraw(uint256 wad) external;
 
-  event Deposit(address indexed dst, uint256 wad);
-  event Withdrawal(address indexed src, uint256 wad);
-
   error ERC2612ExpiredSignature(uint256 deadline);
   error ERC2612InvalidSigner(address signer, address owner);
   error ERC20InvalidReceiver(address);
@@ -114,15 +111,17 @@ contract WOVER is IWOVER {
   }
 
   function deposit() public payable {
+    require(msg.value > 0, 'Deposit must be greater than 0');
     balanceOf[msg.sender] += msg.value;
-    emit Deposit(msg.sender, msg.value);
+    emit Transfer(address(0), msg.sender, msg.value);
   }
 
   function withdraw(uint256 value) external override {
+    require (value > 0, 'Withdrawal must be greater than 0');
     balanceOf[msg.sender] -= value;
     (bool success,) = msg.sender.call{value: value}('');
     require(success, "Withdrawal failed");
-    emit Withdrawal(msg.sender, value);
+    emit Transfer(msg.sender, address(0), value);
   }
 
   function transfer(address to, uint256 value) external override ensuresRecipient(to) returns (bool) {
