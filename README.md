@@ -4,9 +4,9 @@ Wrapped Over Contract
 
 # Deployments
 
-Dolphin Testnet : `0x2eFE8DBa880813F1d988208Ad35c184593559a9D`
+Dolphin Testnet : `0x59c914C8ac6F212bb655737CC80d9Abc79A1e273`
 
-Mainnet: `0x2eFE8DBa880813F1d988208Ad35c184593559a9D`
+Mainnet: `0x59c914C8ac6F212bb655737CC80d9Abc79A1e273`
 
 # Features
 - Support ERC20
