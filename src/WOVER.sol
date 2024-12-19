@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {ECDSA} from '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import {ReentrancyGuard} from '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 
 interface IWOVER {
   function deposit() external payable;
@@ -44,7 +45,7 @@ interface IWOVER {
   function DOMAIN_SEPARATOR() external view returns (bytes32);
 }
 
-contract WOVER is IWOVER {
+contract WOVER is IWOVER, ReentrancyGuard {
   string public constant name = 'Wrapped Over';
   string public constant symbol = 'WOVER';
   uint8 public constant decimals = 18;
@@ -103,21 +104,21 @@ contract WOVER is IWOVER {
     return address(this).balance;
   }
 
-  // STATE MODIFIYING
+  // STATE MODIFYING
   function approve(address spender, uint256 value) external override returns (bool) {
     allowance[msg.sender][spender] = value;
     emit Approval(msg.sender, spender, value);
     return true;
   }
 
-  function deposit() public payable {
+  function deposit() public payable nonReentrant {
     require(msg.value > 0, 'Deposit must be greater than 0');
     balanceOf[msg.sender] += msg.value;
     emit Transfer(address(0), msg.sender, msg.value);
   }
 
-  function withdraw(uint256 value) external override {
-    require (value > 0, 'Withdrawal must be greater than 0');
+  function withdraw(uint256 value) external override nonReentrant {
+    require(value > 0, 'Withdrawal must be greater than 0');
     balanceOf[msg.sender] -= value;
     (bool success,) = msg.sender.call{value: value}('');
     require(success, "Withdrawal failed");
